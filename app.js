@@ -1,51 +1,59 @@
-// app.js
 const express = require("express");
 const User = require("./mongo");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
 const app = express();
+
+// Load environment variables from the .env file
+dotenv.config();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-app.get("/", cors(), (req, res) => {
-});
-
-app.post("/", async (req, res) => {
+// Generate JWT token
+app.post("/user/generateToken", async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ email: email });
 
-    if (user) {
-      res.json("exist");
-    } else {
-      res.json("notexist");
+    if (!user || user.password !== password) {
+      return res.status(401).json({ error: "Invalid credentials" });
     }
+
+    const jwtSecretKey = process.env.JWT_SECRET;
+    const token = jwt.sign({ email }, jwtSecretKey, { expiresIn: "1h" });
+
+    res.json({ token, user });
   } catch (e) {
-    res.json("notexist");
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-app.post("/signup", async (req, res) => {
-  const { email, password } = req.body;
+// Protect routes using JWT
+app.get("/user/profile", (req, res) => {
+  const token = req.header("Authorization");
 
-  const newUser = new User({
-    email: email,
-    password: password,
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const jwtSecretKey = process.env.JWT_SECRET;
+  jwt.verify(token, jwtSecretKey, async (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+
+    const user = await User.findOne({ email: decoded.email });
+
+    if (!user) {
+      return res.status(401).json({ error: "User not found" });
+    }
+
+    res.json({ message: "Protected route", user });
   });
-
-  try {
-    const user = await User.findOne({ email: email });
-
-    if (user) {
-      res.json("exist");
-    } else {
-      await newUser.save();
-      res.json("notexist");
-    }
-  } catch (e) {
-    res.json("notexists");
-  }
 });
 
 app.listen(8000, () => {
