@@ -1,23 +1,27 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
+
 mongoose.connect("mongodb+srv://test:1234@cluster0.eu4qzfb.mongodb.net/carDB")
-.then(()=>{
+  .then(() => {
     console.log("MongoDB connected");
-})
-.catch(()=>{
+  })
+  .catch(() => {
     console.log("Failed");
-})
+  });
 
-const newSchema = new mongoose.Schema({
-    email:{
-        type:String,
-        required:true
-    },
-    password:{
-        type:String,
-        required:true
-    }
-})
+const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  name: String,
+  phoneNumber: String,
+  address: String,
+});
 
-const collection = mongoose.model("login-data",newSchema)
+const User = mongoose.model("User", userSchema);
 
-module.exports=collection
+module.exports = User;
