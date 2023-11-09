@@ -14,20 +14,20 @@ app.use(cors());
 
 // Generate JWT token
 app.post("/user/generateToken", async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
   try {
-    const user = await User.findOne({ email: email });
-
+    const user = await User.findOne({ username: username });
     if (!user || user.password !== password) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
     const jwtSecretKey = process.env.JWT_SECRET;
-    const token = jwt.sign({ email }, jwtSecretKey, { expiresIn: "1h" });
+    const token = jwt.sign({ username }, jwtSecretKey, { expiresIn: "1h" });
 
     res.json({ token, user });
   } catch (e) {
+    console.log(e);
     res.status(500).json({ error: "Server error" });
   }
 });
