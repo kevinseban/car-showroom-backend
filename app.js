@@ -5,19 +5,38 @@ const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const app = express();
 
-// Load environment variables from the .env file
 dotenv.config();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-// Generate JWT token
+app.post("/user/register", async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const existingUser = await User.findOne({ username });
+
+    if (existingUser) {
+      return res.status(400).json({ error: "User already exists" });
+    }
+
+    const newUser = new User({ username, password });
+    await newUser.save();
+
+    res.json({ message: "User registered successfully" });
+  } catch (error) {
+    console.error("Error registering user:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 app.post("/user/generateToken", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const user = await User.findOne({ username: username });
+    const user = await User.findOne({ username });
+
     if (!user || user.password !== password) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
@@ -27,35 +46,11 @@ app.post("/user/generateToken", async (req, res) => {
 
     res.json({ token, user });
   } catch (e) {
-    console.log(e);
+    console.error(e);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// Protect routes using JWT
-app.get("/user/profile", (req, res) => {
-  const token = req.header("Authorization");
-
-  if (!token) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
-  const jwtSecretKey = process.env.JWT_SECRET;
-  jwt.verify(token, jwtSecretKey, async (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ error: "Invalid token" });
-    }
-
-    const user = await User.findOne({ email: decoded.email });
-
-    if (!user) {
-      return res.status(401).json({ error: "User not found" });
-    }
-
-    res.json({ message: "Protected route", user });
-  });
-});
-
 app.listen(8000, () => {
-  console.log("Port connected");
+  console.log("Server is running on port 8000");
 });
