@@ -79,6 +79,12 @@ app.post("/addCar",async(req,res)=>{
   }
 })
 
+app.get("/getMessage",(req,res) => {
+  Message.find()
+  .then(message => res.json(message))
+  .catch(err => res.json(err))
+})
+
 app.listen(8000, () => {
   console.log("Server is running on port 8000");
 });
