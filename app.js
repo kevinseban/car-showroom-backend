@@ -1,5 +1,7 @@
 const express = require("express");
 const User = require("./mongo");
+const Message = require("./models/message");
+const Car = require("./models/addCar");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
@@ -52,6 +54,30 @@ app.post("/user/generateToken", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+app.post("/message",async(req,res)=>{
+  const { messName, messEmail, messPhone, messMessage } = req.body;
+  try{
+    const newMess = new Message({messName, messEmail, messPhone, messMessage})
+    await newMess.save();
+    res.json({ message: "Message sent successfully" });
+  }catch (error) {
+    console.error("Error sending message: ", error);
+    res.status(500).json({ error: "Server error" });
+  }
+})
+
+app.post("/addCar",async(req,res)=>{
+  const { carName, carPrice, carColor, carMileage, carTransmission, carFeatures, imageUrls } = req.body;
+  try{
+    const newCar = new Car({carName, carPrice, carColor, carMileage, carTransmission, carFeatures, imageUrls})
+    await newCar.save();
+    res.json({ message: "Car added successfully" });
+  }catch (error) {
+    console.error("Error Adding Car: ", error);
+    res.status(500).json({ error: "Server error" });
+  }
+})
 
 app.listen(8000, () => {
   console.log("Server is running on port 8000");
