@@ -12,16 +12,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 app.post("/user/register", async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, name, email, phoneNumber } = req.body;
 
   try {
+    // Check if the username already exists
     const existingUser = await User.findOne({ username });
 
     if (existingUser) {
-      return res.status(400).json({ error: "User already exists" });
+      return res.status(400).json({ error: "Username already in use" });
     }
 
-    const newUser = new User({ username, password });
+    // If the username is not in use, create a new user
+    const newUser = new User({ username, password, name, email, phoneNumber });
     await newUser.save();
 
     res.json({ message: "User registered successfully" });

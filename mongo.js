@@ -17,9 +17,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  name: String,
-  phoneNumber: String,
-  address: String,
+  name: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true
+  },
+  phoneNumber: {
+    type: String,
+    required: true
+  },
 });
 
 const User = mongoose.model("users", userSchema);
