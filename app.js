@@ -85,6 +85,18 @@ app.get("/getMessage",(req,res) => {
   .catch(err => res.json(err))
 })
 
+app.post("/deleteMessage" , async(req,res) => {
+  try{
+    const messid = req.query.messid;
+    await Message.deleteOne(
+      {_id:messid}
+    );
+    res.send("deleted");
+  }catch(error) {
+    console.log(error);
+  }
+})
+
 app.listen(8000, () => {
   console.log("Server is running on port 8000");
 });
