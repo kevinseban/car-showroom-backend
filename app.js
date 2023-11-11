@@ -6,13 +6,17 @@ const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const app = express();
+const { storage } = require('./firebase');
+const path = require('path');
+
 
 dotenv.config();
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
+
+//Server Endpoint Code to Register a new User.
 app.post("/user/register", async (req, res) => {
   const { username, password, name, email, phoneNumber } = req.body;
 
@@ -35,6 +39,7 @@ app.post("/user/register", async (req, res) => {
   }
 });
 
+//Server Endpoint Code to generate session token..
 app.post("/user/generateToken", async (req, res) => {
   const { username, password } = req.body;
 
@@ -55,6 +60,7 @@ app.post("/user/generateToken", async (req, res) => {
   }
 });
 
+//Server Endpoint Code Take a message Us request from frontend Contact Us and save it in MongoDb.messages.
 app.post("/message",async(req,res)=>{
   const { messName, messEmail, messPhone, messMessage } = req.body;
   try{
@@ -67,6 +73,27 @@ app.post("/message",async(req,res)=>{
   }
 })
 
+//Server Endpoint Code to Return all complaints from mongoDB.messages to frontend admin panel.
+app.get("/getMessage",(req,res) => {
+  Message.find()
+  .then(message => res.json(message))
+  .catch(err => res.json(err))
+})
+
+//Server Endpoint Code to delete a message from mongoDB.messages.
+app.post("/deleteMessage" , async(req,res) => {
+  try{
+    const messid = req.query.messid;
+    await Message.deleteOne(
+      {_id:messid}
+    );
+    res.send("deleted");
+  }catch(error) {
+    console.log(error);
+  }
+})
+
+//Server endpoint Code for Adding a Car from the admin panel.
 app.post("/addCar",async(req,res)=>{
   const { carName, carPrice, carColor, carMileage, carTransmission, carFeatures, imageUrls } = req.body;
   try {
@@ -112,23 +139,16 @@ app.post("/addCar",async(req,res)=>{
   }
 })
 
-app.get("/getMessage",(req,res) => {
-  Message.find()
-  .then(message => res.json(message))
-  .catch(err => res.json(err))
-})
-
-app.post("/deleteMessage" , async(req,res) => {
-  try{
-    const messid = req.query.messid;
-    await Message.deleteOne(
-      {_id:messid}
-    );
-    res.send("deleted");
-  }catch(error) {
-    console.log(error);
+//Code to return all Cars in the databse to show in the adminpanel.
+app.get('/cars/allCars', async (req, res) => {
+  try {
+    const allCars = await Car.find().populate('colors');
+    res.json(allCars);
+  } catch (error) {
+    console.error('Error fetching all cars: ', error);
+    res.status(500).json({ error: 'Server error' });
   }
-})
+});
 
 app.listen(8000, () => {
   console.log("Server is running on port 8000");
