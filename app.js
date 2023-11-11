@@ -150,6 +150,37 @@ app.get('/cars/allCars', async (req, res) => {
   }
 });
 
+//Code to delete Cars.
+app.post("/deleteCar" , async(req,res) => {
+  try{
+    const carid = req.query.carid;
+    await Car.deleteOne(
+      {_id:carid}
+    );
+    res.send("deleted");
+  }catch(error) {
+    console.log(error);
+  }
+})
+
+//code to get a specific car given id
+app.get('/getCars/:id', async (req, res) => {
+  try {
+    const carId = req.params.id;
+
+    const car = await Car.findById(carId);
+
+    if (!car) {
+      return res.status(404).json({ error: 'Car not found' });
+    }
+
+    res.status(200).json(car);
+  } catch (error) {
+    console.error('Error fetching car details:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 app.listen(8000, () => {
   console.log("Server is running on port 8000");
 });
