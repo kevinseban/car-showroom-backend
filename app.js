@@ -1,7 +1,7 @@
 const express = require("express");
 const User = require("./mongo");
 const Message = require("./models/message");
-const Car = require("./models/addCar");
+const { Car, Color } = require("./models/addCar");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
@@ -69,10 +69,43 @@ app.post("/message",async(req,res)=>{
 
 app.post("/addCar",async(req,res)=>{
   const { carName, carPrice, carColor, carMileage, carTransmission, carFeatures, imageUrls } = req.body;
-  try{
-    const newCar = new Car({carName, carPrice, carColor, carMileage, carTransmission, carFeatures, imageUrls})
-    await newCar.save();
-    res.json({ message: "Car added successfully" });
+  try {
+    // Check if a car with the given name exists
+    let existingCar = await Car.findOne({ name: carName });
+
+    if (!existingCar) {
+      // If the car doesn't exist -> create a new car
+      existingCar = new Car({
+        name: carName,
+        price: carPrice,
+        transmission: carTransmission,
+        mileage: carMileage,
+        features: carFeatures,
+        colors: [],
+      });
+    }
+
+    // Check if the color exists for the existing car
+    let existingColor = existingCar.colors.find((color) => color.name === carColor);
+
+    if (!existingColor) {
+      // If the color doesn't exist -> create a new color
+      existingColor = new Color({
+        name: carColor,
+        images: imageUrls,
+      });
+
+      // Add the new color to the existing car
+      existingCar.colors.push(existingColor);
+    }
+
+    // Add the new image URLs to the existing color
+    existingColor.images = [...existingColor.images, ...imageUrls];
+
+    // Save 
+    await existingCar.save();
+
+    res.json({ message: "Car updated successfully" });
   }catch (error) {
     console.error("Error Adding Car: ", error);
     res.status(500).json({ error: "Server error" });

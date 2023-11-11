@@ -2,20 +2,24 @@ const mongoose = require("mongoose");
 
 mongoose.connect("mongodb+srv://test:1234@cluster0.eu4qzfb.mongodb.net/carDB");
 
-const addCarSchema = new mongoose.Schema({
-    carName:    String,
-    carPrice:   String,
-    carColor:   String,
-    carMileage: String,
-    carTransmission:    String,
-    carFeatures:{
-        type:   Array
-    },
-    imageUrls:{
-        type:   Array
-    }
-})
+const colorSchema = new mongoose.Schema({
+    name: String,
+    images: [String],
+  });
+  
+  const addCarSchema = new mongoose.Schema({
+    name: String,
+    price: Number,
+    colors: [colorSchema],
+    transmission: String,
+    mileage: Number,
+    features: [String],
+  });
 
-const Car = mongoose.model("cars", addCarSchema);
-
-module.exports = Car;
+  const Car = mongoose.model("cars", addCarSchema);
+  const Color = mongoose.model("colors", colorSchema);
+  
+  module.exports = {
+    Car,
+    Color,
+  };
