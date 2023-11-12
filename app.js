@@ -1,5 +1,5 @@
 const express = require("express");
-const User = require("./mongo");
+const User = require("./models/user");
 const Message = require("./models/message");
 const { Car, Color } = require("./models/addCar");
 const cors = require("cors");
@@ -9,26 +9,84 @@ const app = express();
 const { storage } = require('./firebase');
 const path = require('path');
 
-
 dotenv.config();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
+// Middleware to verify JWT token
+const verifyToken = (req, res, next) => {
+  const token = req.header("Authorization");
 
-//Server Endpoint Code to Register a new User.
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized: No token provided" });
+  }
+
+  try {
+    const decoded = jwt.verify(token.replace("Bearer ", ""), process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: "Unauthorized: Invalid token" });
+  }
+};
+
+// Server Endpoint Code to fetch user profile.
+app.get('/user/profile', verifyToken, async (req, res) => {
+  try {
+    // Fetch user details from the decoded token
+    const { username } = req.user;
+
+    // Use the username to retrieve the user profile from the database
+    const userProfile = await User.findOne({ username });
+
+    if (!userProfile) {
+      return res.status(404).json({ error: 'User profile not found' });
+    }
+
+    // Send the user profile in the response
+    res.json(userProfile);
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Endpoint to update user profile
+app.put('/user/profile', verifyToken, async (req, res) => {
+  const { name, password, email, phoneNumber } = req.body;
+  const userId = req.user.username; // Assuming the username is the unique identifier
+
+  try {
+    // Find the user by their username (you may need to adjust based on your user model)
+    const user = await User.findOneAndUpdate(
+      { username: userId },
+      { $set: { name, password, email, phoneNumber } },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ message: 'Profile updated successfully', user });
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Server Endpoint Code to Register a new User.
 app.post("/user/register", async (req, res) => {
   const { username, password, name, email, phoneNumber } = req.body;
 
   try {
-    // Check if the username already exists
     const existingUser = await User.findOne({ username });
 
     if (existingUser) {
       return res.status(400).json({ error: "Username already in use" });
     }
 
-    // If the username is not in use, create a new user
     const newUser = new User({ username, password, name, email, phoneNumber });
     await newUser.save();
 
@@ -39,7 +97,7 @@ app.post("/user/register", async (req, res) => {
   }
 });
 
-//Server Endpoint Code to generate session token..
+// Server Endpoint Code to generate session token.
 app.post("/user/generateToken", async (req, res) => {
   const { username, password } = req.body;
 
@@ -60,48 +118,45 @@ app.post("/user/generateToken", async (req, res) => {
   }
 });
 
-//Server Endpoint Code Take a message Us request from frontend Contact Us and save it in MongoDb.messages.
-app.post("/message",async(req,res)=>{
+// Server Endpoint Code to take a message from frontend Contact Us and save it in MongoDB.messages.
+app.post("/message", async (req, res) => {
   const { messName, messEmail, messPhone, messMessage } = req.body;
-  try{
-    const newMess = new Message({messName, messEmail, messPhone, messMessage})
+  try {
+    const newMess = new Message({ messName, messEmail, messPhone, messMessage });
     await newMess.save();
     res.json({ message: "Message sent successfully" });
-  }catch (error) {
+  } catch (error) {
     console.error("Error sending message: ", error);
     res.status(500).json({ error: "Server error" });
   }
-})
+});
 
-//Server Endpoint Code to Return all complaints from mongoDB.messages to frontend admin panel.
-app.get("/getMessage",(req,res) => {
+// Server Endpoint Code to Return all complaints from MongoDB.messages to frontend admin panel.
+app.get("/getMessage", (req, res) => {
   Message.find()
-  .then(message => res.json(message))
-  .catch(err => res.json(err))
-})
+    .then(message => res.json(message))
+    .catch(err => res.status(500).json({ error: "Server error" }));
+});
 
-//Server Endpoint Code to delete a message from mongoDB.messages.
-app.post("/deleteMessage" , async(req,res) => {
-  try{
+// Server Endpoint Code to delete a message from MongoDB.messages.
+app.post("/deleteMessage", async (req, res) => {
+  try {
     const messid = req.query.messid;
-    await Message.deleteOne(
-      {_id:messid}
-    );
+    await Message.deleteOne({ _id: messid });
     res.send("deleted");
-  }catch(error) {
+  } catch (error) {
     console.log(error);
+    res.status(500).json({ error: "Server error" });
   }
-})
+});
 
-//Server endpoint Code for Adding a Car from the admin panel.
-app.post("/addCar",async(req,res)=>{
+// Server endpoint Code for Adding a Car from the admin panel.
+app.post("/addCar", async (req, res) => {
   const { carName, carPrice, carColor, carMileage, carTransmission, carFeatures, imageUrls } = req.body;
   try {
-    // Check if a car with the given name exists
     let existingCar = await Car.findOne({ name: carName });
 
     if (!existingCar) {
-      // If the car doesn't exist -> create a new car
       existingCar = new Car({
         name: carName,
         price: carPrice,
@@ -112,34 +167,29 @@ app.post("/addCar",async(req,res)=>{
       });
     }
 
-    // Check if the color exists for the existing car
     let existingColor = existingCar.colors.find((color) => color.name === carColor);
 
     if (!existingColor) {
-      // If the color doesn't exist -> create a new color
       existingColor = new Color({
         name: carColor,
         images: imageUrls,
       });
 
-      // Add the new color to the existing car
       existingCar.colors.push(existingColor);
     }
 
-    // Add the new image URLs to the existing color
     existingColor.images = [...existingColor.images, ...imageUrls];
 
-    // Save 
     await existingCar.save();
 
     res.json({ message: "Car updated successfully" });
-  }catch (error) {
+  } catch (error) {
     console.error("Error Adding Car: ", error);
     res.status(500).json({ error: "Server error" });
   }
-})
+});
 
-//Code to return all Cars in the databse to show in the adminpanel.
+// Code to return all Cars in the database to show in the admin panel.
 app.get('/cars/allCars', async (req, res) => {
   try {
     const allCars = await Car.find().populate('colors');
@@ -150,20 +200,19 @@ app.get('/cars/allCars', async (req, res) => {
   }
 });
 
-//Code to delete Cars.
-app.post("/deleteCar" , async(req,res) => {
-  try{
+// Code to delete Cars.
+app.post("/deleteCar", async (req, res) => {
+  try {
     const carid = req.query.carid;
-    await Car.deleteOne(
-      {_id:carid}
-    );
+    await Car.deleteOne({ _id: carid });
     res.send("deleted");
-  }catch(error) {
+  } catch (error) {
     console.log(error);
+    res.status(500).json({ error: "Server error" });
   }
-})
+});
 
-//code to get a specific car given id
+// Code to get a specific car given id
 app.get('/getCars/:id', async (req, res) => {
   try {
     const carId = req.params.id;
@@ -181,6 +230,7 @@ app.get('/getCars/:id', async (req, res) => {
   }
 });
 
+// Start the server
 app.listen(8000, () => {
   console.log("Server is running on port 8000");
 });
