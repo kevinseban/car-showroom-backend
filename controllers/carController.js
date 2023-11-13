@@ -12,8 +12,8 @@ const addCar = async (req, res) => {
         transmission: carTransmission,
         mileage: carMileage,
         features: carFeatures,
-        mainSrc: mainImageUrl,
-        isFeatured: isFeatured,
+        mainSrc : mainImageUrl,
+        isFeatured : isFeatured,
         colors: [],
       });
     }
