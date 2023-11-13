@@ -1,13 +1,14 @@
 const express = require("express");
-const User = require("./models/user");
-const Message = require("./models/message");
-const { Car, Color } = require("./models/addCar");
+const User = require("./models/User");
+const Message = require("./models/Message");
+const { Car, Color } = require("./models/Car");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const app = express();
 const { storage } = require('./firebase');
 const path = require('path');
+const messageRouter = require('./routes/messageRoutes');
 
 dotenv.config();
 app.use(express.json());
@@ -132,11 +133,14 @@ app.post("/message", async (req, res) => {
 });
 
 // Server Endpoint Code to Return all complaints from MongoDB.messages to frontend admin panel.
-app.get("/getMessage", (req, res) => {
-  Message.find()
-    .then(message => res.json(message))
-    .catch(err => res.status(500).json({ error: "Server error" }));
-});
+// app.get("/getMessage", (req, res) => {
+//   Message.find()
+//     .then(message => res.json(message))
+//     .catch(err => res.status(500).json({ error: "Server error" }));
+// });
+
+
+app.use("/getMessage",messageRouter)
 
 // Server Endpoint Code to delete a message from MongoDB.messages.
 app.post("/deleteMessage", async (req, res) => {
