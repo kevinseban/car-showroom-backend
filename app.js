@@ -82,6 +82,16 @@ app.post("/deleteCar", async (req, res) => {
   }
 });
 
+app.get('/featured', async (req, res) => {
+  try {
+    const featuredCars = await Car.find({ isFeatured: true });
+    res.json(featuredCars);
+  } catch (error) {
+    console.error('Error fetching featured cars:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Code to get a specific car given id
 // app.get('/getCars/:id', async (req, res) => {
 //   try {
