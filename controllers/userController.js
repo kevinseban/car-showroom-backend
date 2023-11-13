@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const dotenv = require("dotenv");
+const jwt = require("jsonwebtoken");
 
 const fetchUserProfile = async (req, res) => {
   try {

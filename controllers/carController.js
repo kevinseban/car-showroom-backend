@@ -1,7 +1,7 @@
-const Car = require('../models/Car');
+const {Car, Color} = require('../models/Car');
 
 const addCar = async (req, res) => {
-  const { carName, carPrice, carColor, carMileage, carTransmission, carFeatures, imageUrls } = req.body;
+  const { carName, carPrice, carColor, carMileage, carTransmission, carFeatures, imageUrls, mainImageUrl, isFeatured } = req.body;
   try {
     let existingCar = await Car.findOne({ name: carName });
 
@@ -12,6 +12,8 @@ const addCar = async (req, res) => {
         transmission: carTransmission,
         mileage: carMileage,
         features: carFeatures,
+        mainSrc: mainImageUrl,
+        isFeatured: isFeatured,
         colors: [],
       });
     }
@@ -31,10 +33,10 @@ const addCar = async (req, res) => {
 
     await existingCar.save();
 
-    res.json({ message: 'Car updated successfully' });
+    res.json({ message: "Car updated successfully" });
   } catch (error) {
-    console.error('Error Adding Car: ', error);
-    res.status(500).json({ error: 'Server error' });
+    console.error("Error Adding Car: ", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -52,10 +54,10 @@ const deleteCar = async (req, res) => {
   try {
     const carid = req.query.carid;
     await Car.deleteOne({ _id: carid });
-    res.send('deleted');
+    res.send("deleted");
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: "Server error" });
   }
 };
 
