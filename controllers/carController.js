@@ -1,4 +1,4 @@
-const {Car, Color} = require('../models/Car');
+const { Car, Color } = require('../models/Car');
 
 const addCar = async (req, res) => {
   const { carName, carPrice, carColor, carMileage, carTransmission, carFeatures, imageUrls, mainImageUrl, isFeatured } = req.body;
@@ -12,8 +12,8 @@ const addCar = async (req, res) => {
         transmission: carTransmission,
         mileage: carMileage,
         features: carFeatures,
-        mainSrc : mainImageUrl,
-        isFeatured : isFeatured,
+        mainSrc: mainImageUrl,
+        isFeatured: isFeatured,
         colors: [],
       });
     }
@@ -78,9 +78,20 @@ const getCarById = async (req, res) => {
   }
 };
 
+const getFeaturedCars = async (req, res) => {
+  try {
+    const featuredCars = await Car.find({ isFeatured: true });
+    res.json(featuredCars);
+  } catch (error) {
+    console.error('Error fetching featured cars:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 module.exports = {
   addCar,
   getAllCars,
   deleteCar,
   getCarById,
+  getFeaturedCars
 };
