@@ -15,6 +15,7 @@ const CarSchema = new mongoose.Schema({
   transmission: String,
   mileage: String,
   features: [String],
+  isFeatured : Boolean,
 });
 
 const Car = mongoose.model("cars", CarSchema);
