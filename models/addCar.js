@@ -9,10 +9,11 @@ const colorSchema = new mongoose.Schema({
 
 const addCarSchema = new mongoose.Schema({
   name: String,
-  price: Number,
+  price: String,
+  mainSrc : String,
   colors: [colorSchema],
   transmission: String,
-  mileage: Number,
+  mileage: String,
   features: [String],
 });
 

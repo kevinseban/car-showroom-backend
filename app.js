@@ -152,7 +152,8 @@ app.post("/deleteMessage", async (req, res) => {
 
 // Server endpoint Code for Adding a Car from the admin panel.
 app.post("/addCar", async (req, res) => {
-  const { carName, carPrice, carColor, carMileage, carTransmission, carFeatures, imageUrls } = req.body;
+  const { carName, carPrice, carColor, carMileage, carTransmission, carFeatures, imageUrls, mainImageUrl } = req.body;
+  console.log(mainImageUrl)
   try {
     let existingCar = await Car.findOne({ name: carName });
 
@@ -163,6 +164,7 @@ app.post("/addCar", async (req, res) => {
         transmission: carTransmission,
         mileage: carMileage,
         features: carFeatures,
+        mainSrc : mainImageUrl,
         colors: [],
       });
     }
