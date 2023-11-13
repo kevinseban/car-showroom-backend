@@ -7,7 +7,7 @@ const colorSchema = new mongoose.Schema({
   images: [String],
 });
 
-const addCarSchema = new mongoose.Schema({
+const CarSchema = new mongoose.Schema({
   name: String,
   price: Number,
   colors: [colorSchema],
@@ -16,7 +16,7 @@ const addCarSchema = new mongoose.Schema({
   features: [String],
 });
 
-const Car = mongoose.model("cars", addCarSchema);
+const Car = mongoose.model("cars", CarSchema);
 const Color = mongoose.model("colors", colorSchema);
 
 module.exports = {
