@@ -1,12 +1,6 @@
 const mongoose = require("mongoose");
 
 mongoose.connect("mongodb+srv://test:1234@cluster0.eu4qzfb.mongodb.net/carDB")
-  .then(() => {
-    console.log("MongoDB connected");
-  })
-  .catch(() => {
-    console.log("Failed");
-  });
 
   const bookingSchema = new mongoose.Schema({
   
