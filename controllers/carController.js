@@ -88,10 +88,38 @@ const getFeaturedCars = async (req, res) => {
   }
 };
 
+const editCar = async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Find the car by ID
+    const car = await Car.findById(id);
+
+    if (!car) {
+      return res.status(404).json({ message: 'Car not found' });
+    }
+
+    // Update car properties based on the request body
+    car.name = req.body.name || car.name;
+    car.price = req.body.price || car.price;
+    car.transmission = req.body.transmission || car.transmission;
+    car.mileage = req.body.mileage || car.mileage;
+    car.features = req.body.features || car.features;
+
+    // Save the updated car
+    const updatedCar = await car.save();
+
+    res.json(updatedCar);
+  } catch (error) {
+    console.error('Error updating car:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
+
 module.exports = {
   addCar,
   getAllCars,
   deleteCar,
   getCarById,
-  getFeaturedCars
+  getFeaturedCars,
+  editCar
 };
