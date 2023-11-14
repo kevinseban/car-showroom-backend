@@ -14,4 +14,4 @@ const newBooking = async (req, res) => {
     }
   };
 
-module.exports = newBooking;
+module.exports = {newBooking};
