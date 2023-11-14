@@ -116,11 +116,65 @@ const editCar = async (req, res) => {
   }
 }
 
+const deleteCarImage = async (req, res) => {
+  try {
+    const { id, colorIndex, imageIndex } = req.params;
+
+    const car = await Car.findById(id);
+
+    if (!car) {
+      return res.status(404).json({ message: 'Car not found' });
+    }
+
+    const color = car.colors[colorIndex];
+
+    if (!color) {
+      return res.status(404).json({ message: 'Color not found' });
+    }
+
+    const imageUrlToDelete = color.images[imageIndex];
+
+    // Remove the image URL from the car's data
+    color.images.splice(imageIndex, 1);
+    // Check if the color has no more images and delete the color if true
+    if (color.images.length === 0) {
+      car.colors.splice(colorIndex, 1);
+    }
+    await car.save();
+    res.json({ message: 'Image deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting image:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+const deleteMainImage = async(req, res) => {
+  try{
+    const { id } = req.params;
+
+    const car = await Car.findById(id);
+
+    if (!car) {
+      return res.status(404).json({ message: 'Car not found' });
+    }
+    car.mainSrc = null;
+    
+    await car.save();
+    
+    res.json({ message: 'Main image deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting main image:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
+
 module.exports = {
   addCar,
   getAllCars,
   deleteCar,
   getCarById,
   getFeaturedCars,
-  editCar
+  editCar,
+  deleteCarImage,
+  deleteMainImage
 };
