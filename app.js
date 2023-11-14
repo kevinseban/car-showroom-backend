@@ -16,6 +16,7 @@ app.use(cors());
 app.use("/user",userRouter);
 app.use("/",messageRouter);
 app.use("/cars",carRouter);
+app.use("/admin",adminRouter);
 app.use("/booking",bookingRouter);
 
 app.listen(8000, () => {
