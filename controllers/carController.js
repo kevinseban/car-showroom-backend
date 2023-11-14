@@ -16,6 +16,10 @@ const addCar = async (req, res) => {
         isFeatured: isFeatured,
         colors: [],
       });
+    } else {
+      if(existingCar.mainSrc == ""){
+        existingCar.mainSrc = mainImageUrl;
+      }
     }
 
     let existingColor = existingCar.colors.find((color) => color.name === carColor);
@@ -157,7 +161,7 @@ const deleteMainImage = async(req, res) => {
     if (!car) {
       return res.status(404).json({ message: 'Car not found' });
     }
-    car.mainSrc = null;
+    car.mainSrc = "";
     
     await car.save();
     
