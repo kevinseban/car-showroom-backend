@@ -104,6 +104,7 @@ const editCar = async (req, res) => {
     car.transmission = req.body.transmission || car.transmission;
     car.mileage = req.body.mileage || car.mileage;
     car.features = req.body.features || car.features;
+    car.isFeatured = req.body.isFeatured || car.isFeatured;
 
     // Save the updated car
     const updatedCar = await car.save();
