@@ -106,6 +106,29 @@ const deleteUsers = async (req, res) => {
   }
 };
 
+const updateUser = async (req, res) => {
+  const userId = req.params.id;
+  const { name, username, email, phoneNumber } = req.body;
+
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId },
+      { $set: { name, username, email, phoneNumber } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ message: 'User updated successfully', user: updatedUser });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
 module.exports = {
   fetchUserProfile,
   updateProfile,
@@ -113,4 +136,5 @@ module.exports = {
   generateToken,
   getUsers,
   deleteUsers,
+  updateUser,
 };
