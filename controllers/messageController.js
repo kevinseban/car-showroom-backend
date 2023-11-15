@@ -33,8 +33,48 @@ const deleteMessage = async (req, res) => {
   }
 };
 
+const searchMessages = async (req, res) => {
+  try {
+    const { searchQuery } = req.params;
+    // Use a case-insensitive regular expression for searching
+    const regex = new RegExp(searchQuery, 'i');
+
+    const searchResults = await Message.find({
+      $or: [
+        { messName: regex },   
+        { messEmail: regex },    
+        { messPhone: regex },     
+        { messMessage: regex },   
+      ],
+    });
+
+    res.json(searchResults);
+  } catch (error) {
+    console.error('Error searching for messages:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+const searchMessagesByDate = async (req, res) => {
+  try {
+    const { searchDate } = req.params;
+
+    // Assuming the date is stored as a string in the 'createdAt' field
+    const searchResults = await Message.find({
+      createdAt: { $gte: new Date(searchDate), $lt: new Date(searchDate + 'T23:59:59.999Z') },
+    });
+
+    res.json(searchResults);
+  } catch (error) {
+    console.error('Error searching for messages by date:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 module.exports = {
   sendMessage,
   getMessages,
   deleteMessage,
+  searchMessages,
+  searchMessagesByDate
 };
