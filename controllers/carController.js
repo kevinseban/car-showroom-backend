@@ -189,6 +189,21 @@ const addEditCar = async(req, res) => {
   }
 }
 
+const searchCars = async (req, res) => {
+  try {
+    const { searchTerm } = req.params
+    const searchResults = await Car.find({
+      $or: [
+        { name: { $regex: searchTerm, $options: 'i' } }, // Case-insensitive search for car name
+      ],
+    });
+    res.json(searchResults);
+  } catch (error) {
+    console.error('Error searching for cars:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 module.exports = {
   addCar,
   getAllCars,
@@ -198,5 +213,6 @@ module.exports = {
   editCar,
   deleteCarImage,
   deleteMainImage,
-  addEditCar
+  addEditCar,
+  searchCars,
 };

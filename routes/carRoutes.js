@@ -11,5 +11,6 @@ router.put('/update/:id',carController.editCar);
 router.delete('/deleteImage/:id/:colorIndex/:imageIndex', carController.deleteCarImage);
 router.delete('/deleteMainImage/:id', carController.deleteMainImage);
 router.post('/addEdit',carController.addEditCar);
+router.get('/search/:searchTerm', carController.searchCars);
 
 module.exports = router;
