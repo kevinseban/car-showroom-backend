@@ -41,4 +41,52 @@ const deleteBooking = async (req, res) => {
   }
 };
 
-module.exports = { newBooking, getBookings, deleteBooking };
+const searchBookingsByTerm = async (req, res) => {
+  try {
+    const { searchTerm } = req.params;
+    const regex = new RegExp(searchTerm, 'i');
+
+    const searchResults = await booking.find({
+      $or: [
+        { name: regex },
+        { email: regex },
+        { username: regex },
+        { address: regex },
+        { pincode: regex },
+        { carname: regex },
+        { carcolor: regex },
+        { phone: regex },
+      ],
+    });
+
+    res.json(searchResults);
+  } catch (error) {
+    console.error('Error searching for bookings by term:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+const searchBookingsByDate = async (req, res) => {
+  try {
+    const { bookingDate } = req.params;
+    const istStartDate = new Date(`${bookingDate}T00:00:00.000+05:30`);
+    const istEndDate = new Date(`${bookingDate}T23:59:59.999+05:30`);
+
+    const searchResults = await booking.find({
+      createdAt: { $gte: istStartDate, $lt: istEndDate },
+    });
+
+    res.json(searchResults);
+  } catch (error) {
+    console.error('Error searching for bookings by date:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+module.exports = { 
+  newBooking, 
+  getBookings, 
+  deleteBooking, 
+  searchBookingsByTerm, 
+  searchBookingsByDate };

@@ -191,10 +191,15 @@ const addEditCar = async(req, res) => {
 
 const searchCars = async (req, res) => {
   try {
-    const { searchTerm } = req.params
+    const { searchTerm } = req.params;
     const searchResults = await Car.find({
       $or: [
-        { name: { $regex: searchTerm, $options: 'i' } }, // Case-insensitive search for car name
+        { name: { $regex: searchTerm, $options: 'i' } },
+        { price: { $regex: searchTerm, $options: 'i' } },
+        { transmission: { $regex: searchTerm, $options: 'i' } },
+        { mileage: { $regex: searchTerm, $options: 'i' } },
+        { features: { $regex: searchTerm, $options: 'i' } },
+        { 'colors.name': { $regex: searchTerm, $options: 'i' } },
       ],
     });
     res.json(searchResults);

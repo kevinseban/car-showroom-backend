@@ -58,10 +58,11 @@ const searchMessages = async (req, res) => {
 const searchMessagesByDate = async (req, res) => {
   try {
     const { searchDate } = req.params;
+    const istStartDate = new Date(`${searchDate}T00:00:00.000+05:30`);
+    const istEndDate = new Date(`${searchDate}T23:59:59.999+05:30`);
 
-    // Assuming the date is stored as a string in the 'createdAt' field
     const searchResults = await Message.find({
-      createdAt: { $gte: new Date(searchDate), $lt: new Date(searchDate + 'T23:59:59.999Z') },
+      createdAt: { $gte: istStartDate, $lt: istEndDate },
     });
 
     res.json(searchResults);
@@ -70,6 +71,7 @@ const searchMessagesByDate = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 module.exports = {
   sendMessage,
