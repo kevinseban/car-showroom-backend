@@ -12,43 +12,27 @@ const bookingSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  Username: {
+  username: {
     type: String,
     required: true,
-  },
-  Userstate: {
-    type: String,
-    required: true
   },
   phone: {
     type: String,
     required: true
   },
-  Usercity: {
+  address: {
     type: String,
     required: true
   },
-  Userpin: {
+  pincode: {
     type: String,
     required: true
   },
-  Dealername: {
+  carname: {
     type: String,
     required: true
   },
-  Dealercity: {
-    type: String,
-    required: true
-  },
-  Dealerstate: {
-    type: String,
-    required: true
-  },
-  Carname: {
-    type: String,
-    required: true
-  },
-  Carcolor: {
+  carcolor: {
     type: String,
     required: true
   }
