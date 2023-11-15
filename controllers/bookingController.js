@@ -1,10 +1,10 @@
 const booking = require('../models/Booking');
 
 const newBooking = async (req, res) => {
-  const { name, email, Username, Usercity, Userstate, Userpin, Dealername, Dealercity, Dealerstate, Carname, Carcolor, phone } = req.body;
+  const { name, email, username, address, pincode, carname, carcolor, phone } = req.body;
 
   try {
-    const newbooking = new booking({ name, email, Username, Usercity, Userstate, Userpin, Dealername, Dealercity, Dealerstate, Carname, Carcolor, phone });
+    const newbooking = new booking({ name, email, username, address, pincode, carname, carcolor, phone });
     await newbooking.save();
 
     res.json({ message: "Booked successfully" });
