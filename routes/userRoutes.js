@@ -7,5 +7,7 @@ router.get('/profile', verifyToken, userController.fetchUserProfile);
 router.put('/profile', verifyToken, userController.updateProfile);
 router.post('/register', userController.registerUser);
 router.post('/generateToken', userController.generateToken);
+router.get('/getAll', userController.getUsers);
+router.delete('/delete/:id', userController.deleteUsers);
 
 module.exports = router;
