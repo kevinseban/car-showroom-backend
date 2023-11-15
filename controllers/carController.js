@@ -172,6 +172,23 @@ const deleteMainImage = async(req, res) => {
   }
 }
 
+const addEditCar = async(req, res) => {
+  const {carName , colorName, imageUrls, mainImageUrl} = req.body;
+  try {
+    let existingCar = await Car.findOne({ name: carName });
+    if(existingCar.mainSrc == ""){
+      existingCar.mainSrc = mainImageUrl;
+    }
+    let existingColor = existingCar.colors.find((color) => color.name === colorName);
+    existingColor.images = [...existingColor.images, ...imageUrls];
+    await existingCar.save();
+    res.json({ message: "Car updated successfully" });
+  } catch (error) {
+    console.error("Error Adding Car: ", error);
+    res.status(500).json({ error: "Server error" });
+  }
+}
+
 module.exports = {
   addCar,
   getAllCars,
@@ -180,5 +197,6 @@ module.exports = {
   getFeaturedCars,
   editCar,
   deleteCarImage,
-  deleteMainImage
+  deleteMainImage,
+  addEditCar
 };
