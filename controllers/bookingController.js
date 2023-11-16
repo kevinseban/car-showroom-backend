@@ -83,10 +83,28 @@ const searchBookingsByDate = async (req, res) => {
   }
 };
 
+const getBookingByUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const bookingResult = await booking.find({ username: username });
+
+    if (!bookingResult || bookingResult.length === 0) {
+      return res.status(404).json({ error: 'Booking not found for the given username' });
+    }
+
+    res.json(bookingResult);
+  } catch (error) {
+    console.error('Error fetching booking by username:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
 
 module.exports = { 
   newBooking, 
   getBookings, 
   deleteBooking, 
   searchBookingsByTerm, 
-  searchBookingsByDate };
+  searchBookingsByDate,
+  getBookingByUsername 
+};
