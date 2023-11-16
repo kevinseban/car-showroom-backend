@@ -10,5 +10,7 @@ router.post('/generateToken', userController.generateToken);
 router.get('/getAll', userController.getUsers);
 router.delete('/delete/:id', userController.deleteUsers);
 router.put('/update/:id', userController.updateUser);
+router.get('/search/:searchTerm', userController.searchUsers);
+
 
 module.exports = router;

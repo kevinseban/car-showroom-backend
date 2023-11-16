@@ -128,6 +128,23 @@ const updateUser = async (req, res) => {
   }
 };
 
+const searchUsers = async (req, res) => {
+  try {
+    const { searchTerm } = req.params;
+    const searchResults = await User.find({
+      $or: [
+        { username: { $regex: searchTerm, $options: 'i' } },
+        { email: { $regex: searchTerm, $options: 'i' } },
+        { phoneNumber: { $regex: searchTerm, $options: 'i' } },
+        { name: { $regex: searchTerm, $options: 'i' } },
+      ],
+    });
+    res.json(searchResults);
+  } catch (error) {
+    console.error('Error searching for users:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
 
 module.exports = {
   fetchUserProfile,
@@ -137,4 +154,5 @@ module.exports = {
   getUsers,
   deleteUsers,
   updateUser,
+  searchUsers
 };
