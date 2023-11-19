@@ -1,13 +1,13 @@
 {
   "name": "car-showroom-backend",
   "version": "1.0.0",
-  "description": "��#\u0000 \u0000c\u0000a\u0000r\u0000-\u0000s\u0000h\u0000o\u0000w\u0000r\u0000o\u0000o\u0000m\u0000-\u0000b\u0000a\u0000c\u0000k\u0000e\u0000n\u0000d\u0000\r\u0000 \u0000",
+  "description": "Car Showroom Backend",
   "main": "app.js",
   "scripts": {
     "start": "nodemon app.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Your Name",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
@@ -16,7 +16,12 @@
     "firebase": "^10.6.0",
     "firebase-admin": "^11.11.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.0.0",
+    "mongoose": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=14.17.0"
+  },
+  "devDependencies": {
     "nodemon": "^3.0.1"
   }
 }
